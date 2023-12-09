@@ -1,0 +1,260 @@
+{
+    "openapi" : "3.0.0",
+    "info" : {
+        "version": "1.0.0",
+        "title": "Packet Sniffer",
+        "contact" : {
+            "name" : "Mahdi Alhakim",
+            "email" : "aldocterm@gmail.com"
+        },
+        "license" : {
+            "name" : "MIT"
+        }
+    },
+    "servers" : [{
+        "url" : "localhost:3306"
+    }],
+    "paths" : {
+        "/api/capture/sessions" : {
+            "get" : {
+                "description" : "Get All the Packet-Capture Sessions Stored in the Database",
+                "operationId" : "getCaptureSessions",
+                "responses" : {
+                    "200" : {
+                        "description" : "Successfully Obtained All Stored Sessions.",
+                        "content" : {
+                            "application/json" : {
+                                "schema" : {
+                                    "type" : "array",
+                                    "items" : {
+                                        "$ref" : "#/components/schemas/Session"
+                                    }
+                                }
+                            }
+                        }
+                    } ,
+                    "default" : {
+                        "description" : "Failed to GET Stored Sessions."
+                    }
+                }
+            }
+        },
+        "/api/capture/{sessionID}" : {
+            "get" : {
+                "description" : "Get All the Packets Stored Under a Certain Session.",
+                "operationId" : "getCapturePackets",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "sessionID",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses" : {
+                    "200" : {
+                        "description" : "Successfully Obtained All Corresponding Packets.",
+                        "content" : {
+                            "application/json" : {
+                                "schema" : {
+                                    "type" : "array",
+                                    "items" : {
+                                        "$ref" : "#/components/schemas/Packet"
+                                    }
+                                }
+                            }
+                        }
+                    } ,
+                    "default" : {
+                        "description" : "Failed to GET Packets."
+                    }
+                }
+            },
+            "delete" : {
+                "description" : "Delete A Session Along with All Its Corresponding Packets From the Database.",
+                "operationId" : "deleteSession",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "sessionID",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses" : {
+                    "200" : {
+                        "description" : "Successfully Deleted Session { id = sessionID }."
+                    } ,
+                    "default" : {
+                        "description" : "Failed to Delete Session."
+                    }
+                }
+            }
+        },
+        "/api/capture/new" : {
+            "post" : {
+                "description" : "Send Post Request to Initiate a New Capture with Given Conditions: {device, filter, duration}",
+                "operationId" : "postNewCapture",
+                "requestBody" : {
+                    "required" : true,
+                    "content" : {
+                        "application/json" : {
+                            "schema" : {
+                                "$ref" : "#/components/schemas/new_capture_request_body"
+                            }
+                        }
+                    }
+                },
+                "responses" : {
+                    "200" : {
+                        "description" : "Successfuly Initiated a New Capture Session with Given Conditions: {device, filter, duration}",
+                        "content" : {
+                            "application/json" : {
+                                "schema" : {
+                                    "type" : "string",
+                                    "example" : "Capturing Packets To Session { <sessionName> } ~ 10 sec."
+                                }
+                            }
+                        }
+                    },
+                    "default" : {
+                        "description" : "Failed to Initiate New Capture Session"
+                    }
+                }
+            }
+        },
+        "/api/capture/endCapture" : {
+            "delete" : {
+                "description" : "Send Request to Terminate any Running Capture",
+                "operationId" : "deleteEndRunningCapture",
+                "responses" : {
+                    "200" : {
+                        "description" : "Packet-Capture Session Ended"
+                    },
+                    "default" : {
+                        "description" : "No Running Packet-Capture Session."
+                    }
+                }
+            }
+        }
+    },
+    "components" : {
+        "schemas" : {
+            "Session" : {
+                "type" : "object",
+                "required" : [
+                    "name",
+                    "id",
+                    "device",
+                    "filter",
+                    "time",
+                    "duration"
+                ],
+                "properties" : {
+                    "name" : {
+                        "type" : "string",
+                        "example" : "John Doe"
+                    },
+                    "id" : {
+                        "type" : "integer",
+                        "example" : 0
+                    },
+                    "device" : {
+                        "type" : "string",
+                        "example" : "en0"
+                    },
+                    "filter" : {
+                        "type" : "string",
+                        "example" : "tcp"
+                    },
+                    "time" : {
+                        "type" : "string",
+                        "example" : "2022-01-30 13:22:06"
+                    },
+                    "duration" : {
+                        "type" : "integer",
+                        "example" : 20
+                    }
+                },
+                "example" : {
+                    "name" : "John Doe",
+                    "id" : 0,
+                    "device" : "en0",
+                    "filter" : "tcp",
+                    "time" : "2022-01-30 13:22:06",
+                    "duration" : 20
+                }
+            },
+            "new_capture_request_body" : {
+                "type" : "object",
+                "properties" : {
+                    "name" : {
+                        "type" : "string",
+                        "example" : "John Doe"
+                    },
+                    "device" : {
+                        "type" : "string",
+                        "example" : "en0"
+                    },
+                    "filter" : {
+                        "type" : "string",
+                        "example" : "tcp"
+                    },
+                    "duration" : {
+                        "type" : "integer",
+                        "example" : 20
+                    }
+                },
+                "example" : {
+                    "name" : "sessionName",
+                    "device" : "en0",
+                    "filter" : "tcp",
+                    "duration" : 20
+                }
+            },
+            "Packet" : {
+                "type" : "object",
+                "required" : [
+                    "s_addr",
+                    "d_addr",
+                    "info",
+                    "session_id",
+                    "id"
+                ],
+                "properties" : {
+                    "s_addr" : {
+                        "type" : "string",
+                        "example" : "<sourceAddress>"
+                    },
+                    "d_addr" : {
+                        "type" : "string",
+                        "example" : "<destinationAddress>"
+                    },
+                    "info" : {
+                        "type" : "string",
+                        "example" : "LINKTYPE_ETHERNET <sourceHost> -> <destinationHost> IPv4 <sourceAddress> -> <destinationAddress> flags [d] TCP s_port->d_port seq ... ack ... flags [a] win ... csum ... [.] len 0"
+                    },
+                    "session_id" : {
+                        "type" : "integer",
+                        "example" : 0
+                    },
+                    "id" : {
+                        "type" : "integer",
+                        "example" : 10
+                    }
+                },
+                "example" : {
+                    "s_addr" : "<sourceAddress>",
+                    "d_addr" : "<destinationAddress>",
+                    "info" : "LINKTYPE_ETHERNET <sourceHost> -> <destinationHost> IPv4 <sourceAddress> -> <destinationAddress> flags [d] TCP s_port->d_port seq ... ack ... flags [a] win ... csum ... [.] len 0",
+                    "session_id" : 0,
+                    "id" : 10
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "packet_sniffer",
+  "version": "1.0.0",
+  "description": "This is a node.js Server that captures packets flowing through the network on command and stores them in a database for later access.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "pcap",
+    "packets",
+    "RestAPI"
+  ],
+  "author": "Mahdi Alhakim",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^14.3.2",
+    "express": "^4.17.2",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
